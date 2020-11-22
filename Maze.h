@@ -2,6 +2,7 @@
 
 #include "MCell.h"
 #include <iostream>
+#include <cassert>
 
 class Maze
 {
@@ -21,13 +22,16 @@ public:
 protected:
 	static bool isRight(int i1, int j1, int i2, int j2);
 	static bool isDown(int i1, int j1, int i2, int j2);
+	static void sortArgs(int& i1, int& j1, int& i2, int& j2);
+	static void swap(int& first, int& second) noexcept;
 
+	bool isArgsCorrectForConnection(int i1, int j1, int i2, int j2) const;
 	char getConnectionSymbol(int i, int j) const;
-	bool isCorrect(int i, int j) const;
+	bool isInRange(int i, int j) const;
 	
 private:
-	MCell* get_cell(int i, int j) const;
-	
+	MCell* get_cell(int i, int j, bool needAssert = true) const;
+
 	MCell* m_field;
 	int m_n;
 	int m_m;
