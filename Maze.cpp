@@ -14,14 +14,15 @@ Maze::~Maze()
 
 const MCell& Maze::cell(int i, int j) const
 {
-	return *get_cell(i, j);
+	assert(isInRange(i, j));
+	const auto cell1 = get_cell(i, j);
+	assert(cell1 != nullptr);
+	return *cell1;
 }
 
-MCell* Maze::get_cell(int i, int j, bool needAssert) const
+MCell* Maze::get_cell(int i, int j) const
 {
-	if (needAssert)
-		assert(isInRange(i, j));
-	else if(!isInRange(i, j))
+	if(!isInRange(i, j))
 		return nullptr;
 	
 	return m_field + (i * m_n + j);
@@ -41,8 +42,8 @@ void Maze::swap(int& first, int& second) noexcept
 
 void Maze::sortArgs(int& i1, int& j1, int& i2, int& j2)
 {
-	if (i1 > i2 && j1 == j2
-		|| i1 == i2 && j1 > j2)
+	if ((i1 > i2 && j1 == j2)
+		|| (i1 == i2 && j1 > j2))
 	{
 		swap(i1, i2);
 		swap(j1, j2);
@@ -52,7 +53,7 @@ void Maze::sortArgs(int& i1, int& j1, int& i2, int& j2)
 bool Maze::isArgsCorrectForConnection(int i1, int j1, int i2, int j2) const
 {
 	return isInRange(i1, j1)
-		//&& isInRange(i2, j2)			//В ТЗ не ясно нужно ли соединять с точками за границами, поэтому если нет, то раскомментировать
+		&& isInRange(i2, j2)
 		&& abs(i1 - i2) <= 1
 		&& abs(j1 - j2) <= 1;
 }
@@ -69,10 +70,10 @@ bool Maze::isDown(int i1, int j1, int i2, int j2)
 
 bool Maze::hasConnection(int i1, int j1, int i2, int j2) const
 {
-	sortArgs(i1, j1, i2, j2);
-	
 	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
 		return false;
+	
+	sortArgs(i1, j1, i2, j2);
 	
 	const auto cell1 = cell(i1, j1);
 	
@@ -87,10 +88,10 @@ bool Maze::hasConnection(int i1, int j1, int i2, int j2) const
 
 bool Maze::makeConnection(int i1, int j1, int i2, int j2)
 {
-	sortArgs(i1, j1, i2, j2);
-	
 	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
 		return false;
+	
+	sortArgs(i1, j1, i2, j2);
 	
 	auto& cell1 = *get_cell(i1, j1);
 
@@ -111,22 +112,23 @@ bool Maze::makeConnection(int i1, int j1, int i2, int j2)
 
 bool Maze::removeConnection(int i1, int j1, int i2, int j2)
 {
-	sortArgs(i1, j1, i2, j2);
-	
 	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
 		return false;
 	
-	auto& cell1 = *get_cell(i1, j1);
+	sortArgs(i1, j1, i2, j2);
 
-	if (isRight(i1, j1, i2, j2) && cell1.getRight())
+	auto const cell1 = get_cell(i1, j1);
+	assert(cell1 != nullptr);
+
+	if (isRight(i1, j1, i2, j2) && cell1->getRight())
 	{
-		cell1.m_right = false;
+		cell1->m_right = false;
 		return true;
 	}
 
-	if (isDown(i1, j1, i2, j2) && cell1.getDown())
+	if (isDown(i1, j1, i2, j2) && cell1->getDown())
 	{
-		cell1.m_down = false;
+		cell1->m_down = false;
 		return true;
 	}
 	
@@ -152,8 +154,8 @@ char Maze::getConnectionSymbol(int i, int j) const
 	assert(isInRange(i, j));
 
 	const auto baseCell = *get_cell(i, j);
-	const auto* topCell = get_cell(i - 1, j, false);
-	const auto* leftCell = get_cell(i, j - 1, false);
+	const auto* topCell = get_cell(i - 1, j);
+	const auto* leftCell = get_cell(i, j - 1);
 
 	if (topCell != nullptr && leftCell != nullptr
 		&& topCell->getDown() && leftCell->getRight())

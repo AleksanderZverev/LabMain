@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cassert>
 
+using namespace std;
+
 class Maze
 {
 public:
@@ -30,7 +32,7 @@ protected:
 	bool isInRange(int i, int j) const;
 	
 private:
-	MCell* get_cell(int i, int j, bool needAssert = true) const;
+	MCell* get_cell(int i, int j) const;
 
 	MCell* m_field;
 	int m_n;

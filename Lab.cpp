@@ -9,10 +9,10 @@ void connect_diagonal(Maze& maze)
 	
 	for (int i = 0, j = 0; i < n && j < m; ++i, ++j)
 	{
-		if (!maze.makeConnection(i, j, i, j + 1))
+		if (j + 1 < m && !maze.makeConnection(i, j, i, j + 1))
 			cout << "Can't connect!" << endl;
 
-		if (j + 1 < m && !maze.makeConnection(i, j + 1, i + 1, j + 1))
+		if (j + 1 < m &&  i + 1 < n && !maze.makeConnection(i, j + 1, i + 1, j + 1))
 			cout << "Can't connect!" << endl;
 	}
 }
