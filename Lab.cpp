@@ -41,6 +41,7 @@ void calculate_distances(MTreeNode* baseNode, Maze& maze)
 	const int n = maze.getN(), m = maze.getM();
 
 	int i = baseNode->i(), j = baseNode->j();
+	
 	if (i + 1 < n && maze.hasConnection(i,j, i + 1, j))
 	{
 		if (baseNode->addChild(i + 1, j))
@@ -74,7 +75,10 @@ void print_tree(MTreeNode* base, int n, int m)
 				continue;
 			
 			MTreeNode* child = base->hasChild(i, j);
-			cout << child->distance() << " ";
+			if (child == nullptr)
+				cout << 'X' << ' ';
+			else
+				cout << child->distance() << " ";
 		}
 		cout << endl;
 	}
