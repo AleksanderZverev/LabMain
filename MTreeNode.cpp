@@ -13,7 +13,7 @@ const MTreeNode* MTreeNode::child(int i) const
 {
 	if (i > 0 && i < m_child_count)
 	{
-		MTreeNode* child = *(m_children_array + i);
+		MTreeNode* child = *(m_childrens_array + i);
 		assert(child != nullptr);
 		return child;
 	}
