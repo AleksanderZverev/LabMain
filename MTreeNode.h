@@ -28,11 +28,12 @@ private:
 	~MTreeNode();
 
 	bool isIndexesCorrect(int i, int j) const;
+
+	MTreeNode* const m_parent;
+	MTreeNode** const m_children_array;
 	
 	int m_i;
 	int m_j;
-	MTreeNode* const m_parent;
-	MTreeNode** const m_childrens_array;
 	const int m_distance;
 	int m_child_count;
 	
