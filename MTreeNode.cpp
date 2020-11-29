@@ -4,9 +4,14 @@
 #include <cassert>
 #include <vector>
 
+const MTreeNode* MTreeNode::parent() const
+{
+	return m_parent;
+}
+
 const MTreeNode* MTreeNode::child(int i) const
 {
-	if (i >= 0 && i < m_child_count)
+	if (i > 0 && i < m_child_count)
 	{
 		MTreeNode* child = *(m_children_array + i);
 		assert(child != nullptr);
@@ -14,6 +19,16 @@ const MTreeNode* MTreeNode::child(int i) const
 	}
 	
 	return nullptr;
+}
+
+int MTreeNode::childCount() const
+{
+	return m_child_count;
+}
+
+int MTreeNode::distance() const
+{
+	return m_distance;
 }
 
 bool MTreeNode::addChild(int i, int j)
