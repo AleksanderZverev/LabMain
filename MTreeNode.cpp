@@ -21,16 +21,6 @@ const MTreeNode* MTreeNode::child(int i) const
 	return nullptr;
 }
 
-int MTreeNode::childCount() const
-{
-	return m_child_count;
-}
-
-int MTreeNode::distance() const
-{
-	return m_distance;
-}
-
 bool MTreeNode::addChild(int i, int j)
 {
 	if (!isIndexesCorrect(i, j) || m_child_count >= max_children || hasChild(i, j) != nullptr)
