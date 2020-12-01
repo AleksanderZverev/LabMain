@@ -9,10 +9,10 @@ public:
 	int i() const { return m_i; }
 	int j() const { return m_j; }
 
-	const MTreeNode* parent() const;
+	const MTreeNode* parent() const { return m_parent; }
 	const MTreeNode* child(int i) const;
-	int childCount() const;
-	int distance() const;
+	int childCount() const { return m_child_count; }
+	int distance() const { return m_distance; }
 
 	bool addChild(int i, int j);
 	MTreeNode* hasChild(int i, int j);
