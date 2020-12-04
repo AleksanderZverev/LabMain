@@ -54,8 +54,8 @@ bool Maze::isArgsCorrectForConnection(int i1, int j1, int i2, int j2) const
 {
 	return isInRange(i1, j1)
 		&& isInRange(i2, j2)
-		&& abs(i1 - i2) <= 1
-		&& abs(j1 - j2) <= 1;
+		&& (abs(i1 - i2) == 1 && j1 == j2
+			|| i1 == i2 && abs(j1 - j2) == 1);
 }
 
 bool Maze::isRight(int i1, int j1, int i2, int j2)
