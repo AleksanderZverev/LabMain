@@ -4,6 +4,7 @@
 #include "Maze.h"
 #include "MTreeNode.h"
 #include <iostream>
+#include <iomanip>
 #include <ctime>
 #include <queue>
 #include <vector>
@@ -101,9 +102,15 @@ void get_calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quanti
 	}
 }
 
-void printTree(MTreeNode* base, int n, int m)
+void printTree(MTreeNode* base, int n, int m, int max = 9)
 {
 	int bI = base->i(), bJ = base->j();
+	int space = 0;
+	while(max > 0)
+	{
+		max = max / 10;
+		space++;
+	}
 	
 	for (int i = 0; i < n; ++i)
 	{
@@ -111,15 +118,15 @@ void printTree(MTreeNode* base, int n, int m)
 		{
 			if (bI == i && bJ == j)
 			{
-				cout << 'S' << ' ';
+				cout << setw(space) << 'S' << ' ';
 				continue;
 			}
 			
 			MTreeNode* child = base->findChild(i, j);
 			if (child == nullptr)
-				cout << 'X' << ' ';
+				cout << setw(space) << 'X' << ' ';
 			else
-				cout << child->distance() << " ";
+				cout << setw(space) << child->distance() << " ";
 		}
 		cout << endl;
 	}
@@ -215,10 +222,11 @@ int main()
 	
 	randomMaze.printMaze();
 	cout << endl;
-	print_tree(start, randomMaze.getN(), randomMaze.getM());
+	int max = get_max_index(start, 0);
+	print_tree(start, randomMaze.getN(), randomMaze.getM(), max);
 	cout << endl;
 
-	cout << "Max: " << get_max_index(start, 0) << endl;
+	cout << "Max: " << max << endl;
 	int sum = 0, quantity = 0;
 	get_calculate_sum_and_quantity(start, sum, quantity);
 	cout << "Middle: " << sum / quantity << endl;
