@@ -61,6 +61,13 @@ MTreeNode* MTreeNode::findChild(int i, int j, bool isFullSeek)
 	return nullptr;
 }
 
+MTreeNode* MTreeNode::searchNode(const MTreeNode& tree, const int i, const int j)
+{
+	MTreeNode* child = const_cast<MTreeNode*>(&tree)->hasChild(i, j);
+	
+	return child;
+}
+
 MTreeNode* MTreeNode::beginTree(int i, int j)
 {
 	MTreeNode* node = new MTreeNode(nullptr, i, j, 0);
