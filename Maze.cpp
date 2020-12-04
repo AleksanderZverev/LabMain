@@ -163,6 +163,7 @@ char Maze::getConnectionSymbol(int i, int j) const
 		if (baseCell.getRight() && baseCell.getDown()) return (char)197;
 		if (baseCell.getRight()) return (char)193;
 		if (baseCell.getDown()) return (char)180;
+		return (char)217;
 	}
 
 	if (topCell != nullptr && topCell->getDown())
@@ -181,6 +182,6 @@ char Maze::getConnectionSymbol(int i, int j) const
 
 	if (baseCell.getRight() && baseCell.getDown())
 		return (char)218;
-	
-	return '0';
+
+	return (char)248;
 }
