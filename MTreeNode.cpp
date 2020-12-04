@@ -2,7 +2,7 @@
 
 const MTreeNode* MTreeNode::child(int i) const
 {
-	if (i > 0 && i < m_child_count)
+	if (i >= 0 && i < m_child_count)
 	{
 		MTreeNode* child = *(m_children_array + i);
 		assert(child != nullptr);
@@ -14,10 +14,8 @@ const MTreeNode* MTreeNode::child(int i) const
 
 bool MTreeNode::addChild(int i, int j)
 {
-	if (!isIndexesCorrect(i, j) || m_child_count >= max_children)
+	if (!isIndexesCorrect(i, j) || m_child_count >= max_children || hasChild(i, j) != nullptr)
 		return false;
-
-	//TODO: if hasChild return false; (если потребует ТЗ)
 	
 	MTreeNode* child = new MTreeNode(this, i, j, m_distance + 1);
 	addChildToArray(child);
@@ -26,9 +24,6 @@ bool MTreeNode::addChild(int i, int j)
 
 MTreeNode* MTreeNode::hasChild(int i, int j)
 {
-	if (i < 0 || j < 0)
-		return nullptr;
-	
 	for (int k = 0; k < m_child_count; ++k)
 	{
 		MTreeNode* child = *(m_children_array + k);
