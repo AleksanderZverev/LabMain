@@ -4,6 +4,9 @@
 #include "Maze.h"
 #include "MTreeNode.h"
 #include <iostream>
+#include <ctime>
+#include <queue>
+#include <vector>
 
 using namespace std;
 
@@ -66,16 +69,51 @@ void calculateDistances(MTreeNode* baseNode, Maze& maze)
 	}
 }
 
+int get_max_index(const MTreeNode* base, int max)
+{
+	if (base->childCount() == 0)
+		return  base->distance();
+
+	for (int i = 0; i < base->childCount(); ++i)
+	{
+		const MTreeNode* child = base->child(i);
+		int distance = get_max_index(child, max);
+		if (distance > max)
+			max = distance;
+	}
+	return max;
+}
+
+void get_calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quantity)
+{
+	sum += base->distance();
+	quantity++;
+	
+	if (base->childCount() == 0)
+	{
+		return;
+	}
+
+	for (int i = 0; i < base->childCount(); ++i)
+	{
+		const MTreeNode* child = base->child(i);
+		get_calculate_sum_and_quantity(child, sum, quantity);
+	}
+}
+
 void printTree(MTreeNode* base, const int n, const int m)
 {
-	cout << base->distance() << " ";
+	int bI = base->i(), bJ = base->j();
 	
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < m; ++j)
 		{
-			if (i == 0 && j == 0)
+			if (bI == i && bJ == j)
+			{
+				cout << 'S' << ' ';
 				continue;
+			}
 			
 			MTreeNode* child = base->findChild(i, j);
 			if (child == nullptr)
@@ -87,68 +125,63 @@ void printTree(MTreeNode* base, const int n, const int m)
 	}
 }
 
-void connect_unreachable(Maze& maze)
+bool hasFreeNeighbors(Maze& maze, MTreeNode& source, int i, int j)
 {
-	const int n = maze.getN(), m = maze.getM();
+	int n = maze.getN(), m = maze.getM();
 	
-	for (int i = 0; i < n; ++i)
-	{
-		for (int j = 0; j < m; ++j)
-		{
-			if (j >= i && j + 1 < m)
-			{
-				maze.makeConnection(i, j, i, j + 1);
-			}
-
-			if (j <= i + 1 && i + 1 < n)
-			{
-				maze.makeConnection(i, j, i + 1, j);
-			}
-		}
-	}
+	return i - 1 >= 0 && MTreeNode::searchNode(source, i - 1, j) == nullptr
+		|| j - 1 >= 0 && MTreeNode::searchNode(source, i, j - 1) == nullptr
+		|| i + 1 < n && MTreeNode::searchNode(source, i + 1, j) == nullptr
+		|| j + 1 < m && MTreeNode::searchNode(source, i, j + 1) == nullptr;
 }
 
-void calculate_distances(MTreeNode* baseNode, Maze& maze)
+
+
+void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 {
-	const int n = maze.getN(), m = maze.getM();
-
-	int i = baseNode->i(), j = baseNode->j();
-	if (i + 1 < n && maze.hasConnection(i,j, i + 1, j))
-	{
-		if (baseNode->addChild(i + 1, j))
-		{
-			MTreeNode* child = baseNode->hasChild(i + 1, j);
-			assert(child != nullptr);
-			calculate_distances(child, maze);
-		}
-	}
-
-	if (j + 1 < m && maze.hasConnection(i,j,i, j+1))
-	{
-		if (baseNode->addChild(i,j+1))
-		{
-			MTreeNode* child = baseNode->hasChild(i, j+1);
-			assert(child != nullptr);
-			calculate_distances(child, maze);
-		}
-	}
-}
-
-void print_tree(MTreeNode* base, int n, int m)
-{
-	cout << base->distance() << " ";
+	srand(time(NULL));
 	
-	for (int i = 0; i < n; ++i)
+	const int maxConnections = iMaze.getN() *  iMaze.getM();
+	int countConnections = 0;
+
+	queue<MTreeNode*> nodesQueue;
+	queue<MTreeNode*> nextNodes;
+	nextNodes.push(&tree);
+
+	while (countConnections < maxConnections && nextNodes.size() > 0)
 	{
-		for (int j = 0; j < m; ++j)
+		nodesQueue.swap(nextNodes);
+		
+		while (nodesQueue.size() > 0)
 		{
-			if (i == 0 && j == 0)
-				continue;
+			MTreeNode& currentNode = *nodesQueue.front();
+			nodesQueue.pop();
 			
-			MTreeNode* child = base->hasChild(i, j);
-			cout << child->distance() << " ";
+			int startI = currentNode.i(), startJ = currentNode.j();
+
+			while (currentNode.childCount() < 4 && hasFreeNeighbors(iMaze, tree, startI, startJ))
+			{
+				const int nextI = startI + (rand() % 3 - 1);
+				const int nextJ = startJ + (nextI == startI
+					? rand() % 3 - 1
+					: 0);
+				
+				const bool hasNode = MTreeNode::searchNode(tree, nextI, nextJ) != nullptr;
+
+				if (!hasNode && currentNode.addChild(nextI, nextJ) )
+				{
+					bool isAdded = iMaze.makeConnection(startI, startJ, nextI, nextJ);
+					if (!isAdded)
+						continue;
+					if (hasFreeNeighbors(iMaze, tree, currentNode.i(), currentNode.j()))
+						nextNodes.push(&currentNode);
+					nextNodes.push(MTreeNode::searchNode(tree, nextI, nextJ));
+					countConnections++;
+					break;
+				}
+			}
 		}
-		cout << endl;
+		
 	}
 }
 
@@ -169,4 +202,24 @@ int main()
 	MTreeNode* baseNode = MTreeNode::beginTree(0, 0);
 	calculateDistances(baseNode, mazeUnreachable);
 	printTree(baseNode, mazeUnreachable.getN(), mazeUnreachable.getM());
+
+	cout << endl;
+	
+	Maze randomMaze(5, 5);
+	
+	srand(time(NULL));
+	int i = rand() % randomMaze.getN(), j = rand() % randomMaze.getM();
+	MTreeNode* start = MTreeNode::beginTree(i, j);
+	
+	buildFullMaze(randomMaze, *start);
+	
+	randomMaze.printMaze();
+	cout << endl;
+	print_tree(start, randomMaze.getN(), randomMaze.getM());
+	cout << endl;
+
+	cout << "Max: " << get_max_index(start, 0) << endl;
+	int sum = 0, quantity = 0;
+	get_calculate_sum_and_quantity(start, sum, quantity);
+	cout << "Middle: " << sum / quantity << endl;
 }
