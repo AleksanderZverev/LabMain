@@ -85,20 +85,18 @@ int get_max_index(const MTreeNode* base, int max)
 	return max;
 }
 
-void get_calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quantity)
+void calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quantity)
 {
 	sum += base->distance();
 	quantity++;
 	
 	if (base->childCount() == 0)
-	{
 		return;
-	}
 
 	for (int i = 0; i < base->childCount(); ++i)
 	{
 		const MTreeNode* child = base->child(i);
-		get_calculate_sum_and_quantity(child, sum, quantity);
+		calculate_sum_and_quantity(child, sum, quantity);
 	}
 }
 
@@ -118,7 +116,7 @@ void printTree(MTreeNode* base, int n, int m, int max = 9)
 		{
 			if (bI == i && bJ == j)
 			{
-				cout << setw(space) << 'S' << ' ';
+				cout << setw(space) << '0' << ' ';
 				continue;
 			}
 			
@@ -142,20 +140,15 @@ bool hasFreeNeighbors(Maze& maze, MTreeNode& source, int i, int j)
 		|| j + 1 < m && MTreeNode::searchNode(source, i, j + 1) == nullptr;
 }
 
-
-
 void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 {
 	srand(time(NULL));
-	
-	const int maxConnections = iMaze.getN() *  iMaze.getM();
-	int countConnections = 0;
 
 	queue<MTreeNode*> nodesQueue;
 	queue<MTreeNode*> nextNodes;
 	nextNodes.push(&tree);
 
-	while (countConnections < maxConnections && nextNodes.size() > 0)
+	while (nextNodes.size() > 0)
 	{
 		nodesQueue.swap(nextNodes);
 		
@@ -164,9 +157,10 @@ void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 			MTreeNode& currentNode = *nodesQueue.front();
 			nodesQueue.pop();
 			
-			int startI = currentNode.i(), startJ = currentNode.j();
+			int startI = currentNode.i();
+			int startJ = currentNode.j();
 
-			while (currentNode.childCount() < 4 && hasFreeNeighbors(iMaze, tree, startI, startJ))
+			while (hasFreeNeighbors(iMaze, tree, startI, startJ))
 			{
 				const int nextI = startI + (rand() % 3 - 1);
 				const int nextJ = startJ + (nextI == startI
@@ -183,12 +177,10 @@ void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 					if (hasFreeNeighbors(iMaze, tree, currentNode.i(), currentNode.j()))
 						nextNodes.push(&currentNode);
 					nextNodes.push(MTreeNode::searchNode(tree, nextI, nextJ));
-					countConnections++;
 					break;
 				}
 			}
 		}
-		
 	}
 }
 
@@ -228,6 +220,6 @@ int main()
 
 	cout << "Max: " << max << endl;
 	int sum = 0, quantity = 0;
-	get_calculate_sum_and_quantity(start, sum, quantity);
+	calculate_sum_and_quantity(start, sum, quantity);
 	cout << "Middle: " << sum / quantity << endl;
 }
