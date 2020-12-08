@@ -204,7 +204,7 @@ int main()
 
 	cout << endl;
 	
-	Maze randomMaze(5, 5);
+	Maze randomMaze(10, 10);
 	
 	srand(time(NULL));
 	int i = rand() % randomMaze.getN(), j = rand() % randomMaze.getM();
@@ -215,7 +215,7 @@ int main()
 	randomMaze.printMaze();
 	cout << endl;
 	int max = get_max_index(start, 0);
-	print_tree(start, randomMaze.getN(), randomMaze.getM(), max);
+	printTree(start, randomMaze.getN(), randomMaze.getM(), max);
 	cout << endl;
 
 	cout << "Max: " << max << endl;
