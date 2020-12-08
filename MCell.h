@@ -2,15 +2,15 @@
 
 class MCell
 {
+	friend class Maze;
 
 public:
-	bool getDown() const { return m_down; }
-	bool getRight() const { return  m_right; }
+	bool down() const { return m_down; }
+	bool right() const { return  m_right; }
 
-	friend class Maze;
 private:
-	MCell();
+	MCell(){ }
 	
-	bool m_down;
-	bool m_right;
+	bool m_down = false;
+	bool m_right = false;
 };

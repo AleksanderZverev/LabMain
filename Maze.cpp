@@ -1,9 +1,7 @@
 #include "Maze.h"
 
-Maze::Maze(int n, int m)
+Maze::Maze(int n, int m) : m_n(n), m_m(m)
 {
-	m_n = n;
-	m_m = m;
 	m_field = new MCell[m_n * m_m];
 }
 
@@ -78,10 +76,10 @@ bool Maze::hasConnection(int i1, int j1, int i2, int j2) const
 	const auto cell1 = cell(i1, j1);
 	
 	if (isRight(i1, j1, i2, j2))
-		return cell1.getRight();
+		return cell1.right();
 
 	if (isDown(i1, j1, i2, j2))
-		return cell1.getDown();
+		return cell1.down();
 	
 	return false;
 }
@@ -93,17 +91,18 @@ bool Maze::makeConnection(int i1, int j1, int i2, int j2)
 	
 	sortArgs(i1, j1, i2, j2);
 	
-	auto& cell1 = *get_cell(i1, j1);
+	auto cell1 = get_cell(i1, j1);
+	assert(cell1 != nullptr);
 
 	if (isRight(i1, j1, i2, j2))
 	{
-		cell1.m_right = true;
+		cell1->m_right = true;
 		return true;
 	}
 	
 	if (isDown(i1, j1, i2, j2))
 	{
-		cell1.m_down = true;
+		cell1->m_down = true;
 		return true;
 	}
 	
@@ -120,13 +119,13 @@ bool Maze::removeConnection(int i1, int j1, int i2, int j2)
 	auto const cell1 = get_cell(i1, j1);
 	assert(cell1 != nullptr);
 
-	if (isRight(i1, j1, i2, j2) && cell1->getRight())
+	if (isRight(i1, j1, i2, j2) && cell1->right())
 	{
 		cell1->m_right = false;
 		return true;
 	}
 
-	if (isDown(i1, j1, i2, j2) && cell1->getDown())
+	if (isDown(i1, j1, i2, j2) && cell1->down())
 	{
 		cell1->m_down = false;
 		return true;
@@ -158,29 +157,29 @@ char Maze::getConnectionSymbol(int i, int j) const
 	const auto* leftCell = get_cell(i, j - 1);
 
 	if (topCell != nullptr && leftCell != nullptr
-		&& topCell->getDown() && leftCell->getRight())
+		&& topCell->down() && leftCell->right())
 	{
-		if (baseCell.getRight() && baseCell.getDown()) return (char)197;
-		if (baseCell.getRight()) return (char)193;
-		if (baseCell.getDown()) return (char)180;
+		if (baseCell.right() && baseCell.down()) return (char)197;
+		if (baseCell.right()) return (char)193;
+		if (baseCell.down()) return (char)180;
 		return (char)217;
 	}
 
-	if (topCell != nullptr && topCell->getDown())
+	if (topCell != nullptr && topCell->down())
 	{
-		if (baseCell.getRight() && baseCell.getDown()) return (char)195;
-		if (baseCell.getRight()) return (char)192;
-		if (baseCell.getDown()) return (char)179;
+		if (baseCell.right() && baseCell.down()) return (char)195;
+		if (baseCell.right()) return (char)192;
+		if (baseCell.down()) return (char)179;
 	}
 
-	if (leftCell != nullptr && leftCell->getRight())
+	if (leftCell != nullptr && leftCell->right())
 	{
-		if (baseCell.getRight() && baseCell.getDown()) return (char)194;
-		if (baseCell.getRight()) return (char)196;
-		if (baseCell.getDown()) return (char)191;
+		if (baseCell.right() && baseCell.down()) return (char)194;
+		if (baseCell.right()) return (char)196;
+		if (baseCell.down()) return (char)191;
 	}
 
-	if (baseCell.getRight() && baseCell.getDown())
+	if (baseCell.right() && baseCell.down())
 		return (char)218;
 
 	return (char)248;

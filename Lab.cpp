@@ -1,25 +1,29 @@
-﻿#include "Maze.h"
-#include <iostream>
+﻿#include <iostream>
+#include "Maze.h"
 
 using namespace std;
 
-void connect_diagonal(Maze& maze)
+void connectLadder(Maze& maze)
 {
 	const int n = maze.getN(), m = maze.getM();
 	
-	for (int i = 0, j = 0; i < n && j < m; ++i, ++j)
+	for (int i = 0; i < n && i < m; ++i)
 	{
-		if (j + 1 < m && !maze.makeConnection(i, j, i, j + 1))
-			cout << "Can't connect!" << endl;
+		if (i + 1 < m)
+		{
+			maze.makeConnection(i, i, i, i + 1);
+		}
 
-		if (j + 1 < m &&  i + 1 < n && !maze.makeConnection(i, j + 1, i + 1, j + 1))
-			cout << "Can't connect!" << endl;
+		if (i + 1 < m &&  i + 1 < n)
+		{
+			maze.makeConnection(i, i + 1, i + 1, i + 1);
+		}
 	}
 }
 
 int main()
 {
 	Maze maze(5, 5);
-	connect_diagonal(maze);
+	connectLadder(maze);
 	maze.printMaze();
 }
