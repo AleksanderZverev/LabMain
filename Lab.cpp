@@ -15,7 +15,7 @@ void connectLadder(Maze& maze)
 	}
 }
 
-void connect_unreachable(Maze& maze)
+void connectUnreachableLines(Maze& maze)
 {
 	const int n = maze.getN(), m = maze.getM();
 	
@@ -36,7 +36,7 @@ void connect_unreachable(Maze& maze)
 	}
 }
 
-void calculate_distances(MTreeNode* baseNode, Maze& maze)
+void calculateDistances(MTreeNode* baseNode, Maze& maze)
 {
 	const int n = maze.getN(), m = maze.getM();
 
@@ -48,7 +48,7 @@ void calculate_distances(MTreeNode* baseNode, Maze& maze)
 		{
 			MTreeNode* child = baseNode->hasChild(i + 1, j);
 			assert(child != nullptr);
-			calculate_distances(child, maze);
+			calculateDistances(child, maze);
 		}
 	}
 
@@ -58,12 +58,12 @@ void calculate_distances(MTreeNode* baseNode, Maze& maze)
 		{
 			MTreeNode* child = baseNode->hasChild(i, j+1);
 			assert(child != nullptr);
-			calculate_distances(child, maze);
+			calculateDistances(child, maze);
 		}
 	}
 }
 
-void print_tree(MTreeNode* base, int n, int m)
+void printTree(MTreeNode* base, int n, int m)
 {
 	cout << base->distance() << " ";
 	
@@ -93,12 +93,12 @@ int main()
 	cout << endl;
 	
 	Maze mazeUnreachable(5, 5);
-	connect_unreachable(mazeUnreachable);
+	connectUnreachableLines(mazeUnreachable);
 	mazeUnreachable.printMaze();
 
 	cout << endl;
 
 	MTreeNode* baseNode = MTreeNode::beginTree(0, 0);
-	calculate_distances(baseNode, mazeUnreachable);
-	print_tree(baseNode, mazeUnreachable.getN(), mazeUnreachable.getM());
+	calculateDistances(baseNode, mazeUnreachable);
+	printTree(baseNode, mazeUnreachable.getN(), mazeUnreachable.getM());
 }
