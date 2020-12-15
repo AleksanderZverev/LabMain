@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <vector>
 
 class MTreeNode
 {
@@ -16,12 +17,12 @@ public:
 
 	bool addChild(int i, int j);
 	MTreeNode* hasChild(int i, int j);
+	MTreeNode* findChild(int i, int j, bool isFullSeek = true);
 
 	static MTreeNode* beginTree(int i, int j);
 
 protected:
 	void addChildToArray(MTreeNode* child);
-	
 	
 private:
 	MTreeNode(MTreeNode* parent, int i, int j, int distance);
