@@ -129,23 +129,42 @@ void printTree(MTreeNode* base, const int n, const int m, int max = 9)
 	}
 }
 
-bool hasFreeNeighbors(Maze& maze, MTreeNode& source, int i, int j)
+MTreeNode* getNode(const vector<MTreeNode*>& mazeArray, const int m, const int i, const int j)
 {
-	int n = maze.getN(), m = maze.getM();
-	
-	return i - 1 >= 0 && MTreeNode::searchNode(source, i - 1, j) == nullptr
-		|| j - 1 >= 0 && MTreeNode::searchNode(source, i, j - 1) == nullptr
-		|| i + 1 < n && MTreeNode::searchNode(source, i + 1, j) == nullptr
-		|| j + 1 < m && MTreeNode::searchNode(source, i, j + 1) == nullptr;
+	const int index = i * m + j;
+	if (index < 0 || index >= mazeArray.size())
+		return nullptr;
+	return mazeArray[index];
+}
+
+MTreeNode* pushNode(vector<MTreeNode*>& mazeArray, const int m, MTreeNode* node)
+{
+	const int i = node->i(), j = node->j();
+	const int index = i * m + j;
+	assert(index >= 0 && index < mazeArray.size());
+	mazeArray[index] = node;
+	return mazeArray[index];
+}
+
+bool hasFreeNeighbors(vector<MTreeNode*>& mazeArray, int n, int m, int i, int j)
+{
+	return i - 1 >= 0 && getNode(mazeArray, m, i - 1, j) == nullptr
+		|| j - 1 >= 0 && getNode(mazeArray, m, i, j - 1) == nullptr
+		|| i + 1 < n && getNode(mazeArray, m, i + 1, j) == nullptr
+		|| j + 1 < m && getNode(mazeArray, m, i, j + 1) == nullptr;
 }
 
 void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 {
 	srand(time(NULL));
 
+	int n = iMaze.getN(), m = iMaze.getM();
+	vector<MTreeNode*> mazeArray(n * m);
+
 	queue<MTreeNode*> nodesQueue;
 	queue<MTreeNode*> nextNodes;
 	nextNodes.push(&tree);
+	pushNode(mazeArray, m, &tree);
 
 	while (nextNodes.size() > 0)
 	{
@@ -156,26 +175,30 @@ void buildFullMaze(Maze& iMaze, MTreeNode& tree)
 			MTreeNode& currentNode = *nodesQueue.front();
 			nodesQueue.pop();
 			
-			int startI = currentNode.i();
-			int startJ = currentNode.j();
+			const int startI = currentNode.i(), startJ = currentNode.j();
 
-			while (hasFreeNeighbors(iMaze, tree, startI, startJ))
+			while (hasFreeNeighbors(mazeArray, n, m, startI, startJ))
 			{
 				const int nextI = startI + (rand() % 3 - 1);
 				const int nextJ = startJ + (nextI == startI
 					? rand() % 3 - 1
 					: 0);
 				
-				const bool hasNode = MTreeNode::searchNode(tree, nextI, nextJ) != nullptr;
+				const bool hasNode = getNode(mazeArray, m, nextI, nextJ) != nullptr;
 
 				if (!hasNode && currentNode.addChild(nextI, nextJ) )
 				{
 					bool isAdded = iMaze.makeConnection(startI, startJ, nextI, nextJ);
 					if (!isAdded)
 						continue;
-					if (hasFreeNeighbors(iMaze, tree, currentNode.i(), currentNode.j()))
+					
+					if (hasFreeNeighbors(mazeArray, n, m, startI, startJ))
 						nextNodes.push(&currentNode);
-					nextNodes.push(MTreeNode::searchNode(tree, nextI, nextJ));
+					
+					MTreeNode* addedChild = MTreeNode::searchNode(tree, nextI, nextJ);
+					pushNode(mazeArray, m, addedChild);
+					nextNodes.push(addedChild);
+					
 					break;
 				}
 			}
