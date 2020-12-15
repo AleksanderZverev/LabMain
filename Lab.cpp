@@ -74,7 +74,7 @@ void printTree(MTreeNode* base, int n, int m)
 			if (i == 0 && j == 0)
 				continue;
 			
-			MTreeNode* child = base->hasChild(i, j);
+			MTreeNode* child = base->findChild(i, j);
 			if (child == nullptr)
 				cout << 'X' << ' ';
 			else

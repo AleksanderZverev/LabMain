@@ -24,18 +24,31 @@ bool MTreeNode::addChild(int i, int j)
 
 MTreeNode* MTreeNode::hasChild(int i, int j)
 {
+	return findChild(i, j, false);
+}
+
+MTreeNode* MTreeNode::findChild(int i, int j, bool isFullSeek)
+{
+	std::vector<MTreeNode*> children(m_child_count);
+
 	for (int k = 0; k < m_child_count; ++k)
 	{
+		
 		MTreeNode* child = *(m_children_array + k);
 		assert(child != nullptr);
 		if (child->m_i == i && child->m_j == j)
 			return child;
-
-		MTreeNode* childByChild = child->hasChild(i, j);
-		if (childByChild != nullptr)
-			return childByChild;
+		children[k] = child;
 	}
-	
+
+	if (isFullSeek)
+		for (MTreeNode* child : children)
+		{
+			MTreeNode* childByChild = child->findChild(i, j);
+			if (childByChild != nullptr)
+				return childByChild;
+		}
+
 	return nullptr;
 }
 
@@ -67,6 +80,5 @@ MTreeNode::~MTreeNode()
 
 bool MTreeNode::isIndexesCorrect(int i, int j) const
 {
-	return abs(i - m_i) == 1 && m_j == j
-		|| abs(j - m_j) == 1 && i == m_i;
+	return abs(i - m_i) + abs(j - m_j) == 1;
 }
