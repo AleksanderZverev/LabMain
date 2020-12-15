@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <ctime>
 #include <queue>
-#include <vector>
 
 using namespace std;
 
@@ -70,7 +69,7 @@ void calculateDistances(MTreeNode* baseNode, Maze& maze)
 	}
 }
 
-int get_max_index(const MTreeNode* base, int max)
+int getMaxIndex(const MTreeNode* base, int max)
 {
 	if (base->childCount() == 0)
 		return  base->distance();
@@ -78,14 +77,14 @@ int get_max_index(const MTreeNode* base, int max)
 	for (int i = 0; i < base->childCount(); ++i)
 	{
 		const MTreeNode* child = base->child(i);
-		int distance = get_max_index(child, max);
+		int distance = getMaxIndex(child, max);
 		if (distance > max)
 			max = distance;
 	}
 	return max;
 }
 
-void calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quantity)
+void calculateSumAndQuantity(const MTreeNode* base, int& sum, int& quantity)
 {
 	sum += base->distance();
 	quantity++;
@@ -96,7 +95,7 @@ void calculate_sum_and_quantity(const MTreeNode* base, int& sum, int& quantity)
 	for (int i = 0; i < base->childCount(); ++i)
 	{
 		const MTreeNode* child = base->child(i);
-		calculate_sum_and_quantity(child, sum, quantity);
+		calculateSumAndQuantity(child, sum, quantity);
 	}
 }
 
@@ -214,12 +213,12 @@ int main()
 	
 	randomMaze.printMaze();
 	cout << endl;
-	int max = get_max_index(start, 0);
+	int max = getMaxIndex(start, 0);
 	printTree(start, randomMaze.getN(), randomMaze.getM(), max);
 	cout << endl;
 
 	cout << "Max: " << max << endl;
 	int sum = 0, quantity = 0;
-	calculate_sum_and_quantity(start, sum, quantity);
+	calculateSumAndQuantity(start, sum, quantity);
 	cout << "Middle: " << sum / quantity << endl;
 }

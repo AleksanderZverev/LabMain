@@ -11,7 +11,7 @@ const MTreeNode* MTreeNode::parent() const
 
 const MTreeNode* MTreeNode::child(int i) const
 {
-	if (i > 0 && i < m_child_count)
+	if (i >= 0 && i < m_child_count)
 	{
 		MTreeNode* child = *(m_children_array + i);
 		assert(child != nullptr);
@@ -63,8 +63,7 @@ MTreeNode* MTreeNode::findChild(int i, int j, bool isFullSeek)
 
 MTreeNode* MTreeNode::searchNode(const MTreeNode& tree, const int i, const int j)
 {
-	MTreeNode* child = const_cast<MTreeNode*>(&tree)->hasChild(i, j);
-	
+	MTreeNode* child = const_cast<MTreeNode*>(&tree)->findChild(i, j);
 	return child;
 }
 
