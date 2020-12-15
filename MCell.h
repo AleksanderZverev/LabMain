@@ -9,7 +9,7 @@ public:
 	bool right() const { return  m_right; }
 
 private:
-	MCell(){ }
+	MCell() = default;
 	
 	bool m_down = false;
 	bool m_right = false;

@@ -31,107 +31,52 @@ bool Maze::isInRange(int i, int j) const
 	return i < m_n && j < m_m && i >= 0 && j >= 0;
 }
 
-void Maze::swap(int& first, int& second) noexcept
+bool Maze::defineConnectionAndReturn(int i1, int j1, int i2, int j2, 
+	bool (*returnForRightConnection)(MCell* minCell),
+	bool (*returnForDownConnection)(MCell* minCell)) const
 {
-	const int temp = first;
-	first = second;
-	second = temp;
-}
+	const int iAbsDifference = abs(i1 - i2);
+	const int jAbsDifference = abs(j1 - j2);
 
-void Maze::sortArgs(int& i1, int& j1, int& i2, int& j2)
-{
-	if ((i1 > i2 && j1 == j2)
-		|| (i1 == i2 && j1 > j2))
-	{
-		swap(i1, i2);
-		swap(j1, j2);
-	}
-}
+	if (iAbsDifference + jAbsDifference != 1
+		|| !isInRange(i1, j1)
+		|| !isInRange(i2, j2))
+		return false;
 
-bool Maze::isArgsCorrectForConnection(int i1, int j1, int i2, int j2) const
-{
-	return isInRange(i1, j1)
-		&& isInRange(i2, j2)
-		&& (abs(i1 - i2) == 1 && j1 == j2
-			|| i1 == i2 && abs(j1 - j2) == 1);
-}
+	auto cell1 = get_cell(std::min(i1, i2), std::min(j1, j2));
+	assert(cell1 != nullptr);
 
-bool Maze::isRight(int i1, int j1, int i2, int j2)
-{
-	return i1 == i2 && j2 - j1 == 1;
-}
+	if (jAbsDifference == 1)
+		return returnForRightConnection(cell1);
 
-bool Maze::isDown(int i1, int j1, int i2, int j2)
-{
-	return i2 - i1 == 1 && j1 == j2;
+	if (iAbsDifference == 1)
+		return returnForDownConnection(cell1);
+
+	return false;
 }
 
 bool Maze::hasConnection(int i1, int j1, int i2, int j2) const
 {
-	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
-		return false;
+	auto rightF = [](MCell* leftCell) -> bool { return leftCell->right();  };
+	auto downF = [](MCell* upCell) -> bool { return upCell->down(); };
 	
-	sortArgs(i1, j1, i2, j2);
-	
-	const auto cell1 = cell(i1, j1);
-	
-	if (isRight(i1, j1, i2, j2))
-		return cell1.right();
-
-	if (isDown(i1, j1, i2, j2))
-		return cell1.down();
-	
-	return false;
+	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
 }
 
 bool Maze::makeConnection(int i1, int j1, int i2, int j2)
 {
-	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
-		return false;
-	
-	sortArgs(i1, j1, i2, j2);
-	
-	auto cell1 = get_cell(i1, j1);
-	assert(cell1 != nullptr);
+	auto rightF = [](MCell* leftCell) -> bool { leftCell->m_right = true; return true;  };
+	auto downF = [](MCell* upCell) -> bool { upCell->m_down = true; return true; };
 
-	if (isRight(i1, j1, i2, j2))
-	{
-		cell1->m_right = true;
-		return true;
-	}
-	
-	if (isDown(i1, j1, i2, j2))
-	{
-		cell1->m_down = true;
-		return true;
-	}
-	
-	return false;
+	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
 }
 
 bool Maze::removeConnection(int i1, int j1, int i2, int j2)
 {
-	if (!isArgsCorrectForConnection(i1, j1, i2, j2))
-		return false;
-	
-	sortArgs(i1, j1, i2, j2);
+	auto rightF = [](MCell* leftCell) -> bool { leftCell->m_right = false; return true;  };
+	auto downF = [](MCell* upCell) -> bool { upCell->m_down = false; return true; };
 
-	auto const cell1 = get_cell(i1, j1);
-	assert(cell1 != nullptr);
-
-	if (isRight(i1, j1, i2, j2) && cell1->right())
-	{
-		cell1->m_right = false;
-		return true;
-	}
-
-	if (isDown(i1, j1, i2, j2) && cell1->down())
-	{
-		cell1->m_down = false;
-		return true;
-	}
-	
-	return false;
+	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
 }
 
 void Maze::printMaze() const

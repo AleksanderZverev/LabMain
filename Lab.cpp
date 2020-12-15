@@ -1,7 +1,4 @@
-﻿#include <iostream>
-#include "Maze.h"
-
-using namespace std;
+﻿#include "Maze.h"
 
 void connectLadder(Maze& maze)
 {
@@ -9,15 +6,8 @@ void connectLadder(Maze& maze)
 	
 	for (int i = 0; i < n && i < m; ++i)
 	{
-		if (i + 1 < m)
-		{
-			maze.makeConnection(i, i, i, i + 1);
-		}
-
-		if (i + 1 < m &&  i + 1 < n)
-		{
-			maze.makeConnection(i, i + 1, i + 1, i + 1);
-		}
+		maze.makeConnection(i, i, i, i + 1);
+		maze.makeConnection(i, i + 1, i + 1, i + 1);
 	}
 }
 
