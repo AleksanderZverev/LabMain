@@ -1,9 +1,7 @@
 #pragma once
 
 #include "MCell.h"
-#include <iostream>
-#include <algorithm>
-#include <cassert>
+
 
 class Maze
 {
@@ -30,7 +28,7 @@ protected:
 private:
 	MCell* get_cell(int i, int j) const;
 
-	MCell* m_field;
-	int m_n;
-	int m_m;
+	MCell* m_field = nullptr;
+	const int m_n = 0;
+	const int m_m = 0;
 };

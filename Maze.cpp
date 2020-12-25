@@ -1,4 +1,7 @@
 #include "Maze.h"
+#include <iostream>
+#include <algorithm>
+#include <cassert>
 
 Maze::Maze(int n, int m) : m_n(n), m_m(m)
 {
@@ -81,15 +84,13 @@ bool Maze::removeConnection(int i1, int j1, int i2, int j2)
 
 void Maze::printMaze() const
 {
-	using namespace std;
-	
 	for (int i = 0; i < m_n; ++i)
 	{
 		for (int j = 0; j < m_m; ++j)
 		{
-			cout << getConnectionSymbol(i, j);
+			std::cout << getConnectionSymbol(i, j);
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 }
 
