@@ -1,12 +1,12 @@
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <queue>
 #include <cassert>
 
 #include "Maze.h"
 #include "MTreeNode.h"
-#include <iostream>
-#include <iomanip>
-#include <ctime>
-#include <queue>
+
 
 using namespace std;
 
