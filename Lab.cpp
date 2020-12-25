@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cassert>
+
 #include "Maze.h"
 #include "MTreeNode.h"
 
