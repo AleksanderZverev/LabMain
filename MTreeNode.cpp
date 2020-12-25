@@ -1,5 +1,9 @@
 #include "MTreeNode.h"
 
+#include <algorithm>
+#include <cassert>
+#include <vector>
+
 const MTreeNode* MTreeNode::child(int i) const
 {
 	if (i >= 0 && i < m_child_count)

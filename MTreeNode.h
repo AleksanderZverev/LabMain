@@ -1,9 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <cassert>
-#include <vector>
-
 class MTreeNode
 {
 public:
@@ -30,13 +26,13 @@ private:
 
 	bool isIndexesCorrect(int i, int j) const;
 
-	MTreeNode* const m_parent;
-	MTreeNode** const m_children_array;
+	MTreeNode* const m_parent = nullptr;
+	MTreeNode** const m_children_array = nullptr;
 	
-	int m_i;
-	int m_j;
-	const int m_distance;
-	int m_child_count;
+	const int m_i = 0;
+	const int m_j = 0;
+	const int m_distance = 0;
+	int m_child_count = 0;
 	
 	static const int max_children = 4;
 };
