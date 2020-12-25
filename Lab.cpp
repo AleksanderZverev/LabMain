@@ -1,8 +1,12 @@
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <queue>
 #include <cassert>
 
 #include "Maze.h"
 #include "MTreeNode.h"
+
 
 using namespace std;
 
@@ -65,24 +69,140 @@ void calculateDistances(MTreeNode* baseNode, Maze& maze)
 	}
 }
 
-void printTree(MTreeNode* base, int n, int m)
+int getMaxIndex(const MTreeNode* base, int max)
 {
-	cout << base->distance() << " ";
+	if (base->childCount() == 0)
+		return  base->distance();
+
+	for (int i = 0; i < base->childCount(); ++i)
+	{
+		const MTreeNode* child = base->child(i);
+		int distance = getMaxIndex(child, max);
+		if (distance > max)
+			max = distance;
+	}
+	return max;
+}
+
+void calculateSumAndQuantity(const MTreeNode* base, int& sum, int& quantity)
+{
+	sum += base->distance();
+	quantity++;
+	
+	if (base->childCount() == 0)
+		return;
+
+	for (int i = 0; i < base->childCount(); ++i)
+	{
+		const MTreeNode* child = base->child(i);
+		calculateSumAndQuantity(child, sum, quantity);
+	}
+}
+
+void printTree(MTreeNode* base, int n, int m, int max = 9)
+{
+	int bI = base->i(), bJ = base->j();
+	int space = 0;
+	while(max > 0)
+	{
+		max = max / 10;
+		space++;
+	}
 	
 	for (int i = 0; i < n; ++i)
 	{
 		for (int j = 0; j < m; ++j)
 		{
-			if (i == 0 && j == 0)
+			if (bI == i && bJ == j)
+			{
+				cout << setw(space) << '0' << ' ';
 				continue;
+			}
 			
 			MTreeNode* child = base->findChild(i, j);
 			if (child == nullptr)
-				cout << 'X' << ' ';
+				cout << setw(space) << 'X' << ' ';
 			else
-				cout << child->distance() << " ";
+				cout << setw(space) << child->distance() << " ";
 		}
 		cout << endl;
+	}
+}
+
+MTreeNode* getNode(const vector<MTreeNode*>& mazeArray, const int m, const int i, const int j)
+{
+	const int index = i * m + j;
+	if (index < 0 || index >= mazeArray.size())
+		return nullptr;
+	return mazeArray[index];
+}
+
+MTreeNode* pushNode(vector<MTreeNode*>& mazeArray, const int m, MTreeNode* node)
+{
+	const int i = node->i(), j = node->j();
+	const int index = i * m + j;
+	assert(index >= 0 && index < mazeArray.size());
+	mazeArray[index] = node;
+	return mazeArray[index];
+}
+
+bool hasFreeNeighbors(vector<MTreeNode*>& mazeArray, int n, int m, int i, int j)
+{
+	return i - 1 >= 0 && getNode(mazeArray, m, i - 1, j) == nullptr
+		|| j - 1 >= 0 && getNode(mazeArray, m, i, j - 1) == nullptr
+		|| i + 1 < n && getNode(mazeArray, m, i + 1, j) == nullptr
+		|| j + 1 < m && getNode(mazeArray, m, i, j + 1) == nullptr;
+}
+
+void buildFullMaze(Maze& iMaze, MTreeNode& tree)
+{
+	srand(time(NULL));
+
+	int n = iMaze.getN(), m = iMaze.getM();
+	vector<MTreeNode*> mazeArray(n * m);
+
+	queue<MTreeNode*> nodesQueue;
+	queue<MTreeNode*> nextNodes;
+	nextNodes.push(&tree);
+	pushNode(mazeArray, m, &tree);
+
+	while (nextNodes.size() > 0)
+	{
+		nodesQueue.swap(nextNodes);
+		
+		while (nodesQueue.size() > 0)
+		{
+			MTreeNode& currentNode = *nodesQueue.front();
+			nodesQueue.pop();
+			
+			const int startI = currentNode.i(), startJ = currentNode.j();
+
+			while (hasFreeNeighbors(mazeArray, n, m, startI, startJ))
+			{
+				const int nextI = startI + (rand() % 3 - 1);
+				const int nextJ = startJ + (nextI == startI
+					? rand() % 3 - 1
+					: 0);
+				
+				const bool hasNode = getNode(mazeArray, m, nextI, nextJ) != nullptr;
+
+				if (!hasNode && currentNode.addChild(nextI, nextJ) )
+				{
+					bool isAdded = iMaze.makeConnection(startI, startJ, nextI, nextJ);
+					if (!isAdded)
+						continue;
+					
+					if (hasFreeNeighbors(mazeArray, n, m, startI, startJ))
+						nextNodes.push(&currentNode);
+					
+					MTreeNode* addedChild = MTreeNode::searchNode(tree, nextI, nextJ);
+					pushNode(mazeArray, m, addedChild);
+					nextNodes.push(addedChild);
+					
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -103,4 +223,25 @@ int main()
 	MTreeNode* baseNode = MTreeNode::beginTree(0, 0);
 	calculateDistances(baseNode, mazeUnreachable);
 	printTree(baseNode, mazeUnreachable.getN(), mazeUnreachable.getM());
+
+	cout << endl;
+	
+	Maze randomMaze(10, 10);
+	
+	srand(time(NULL));
+	int i = rand() % randomMaze.getN(), j = rand() % randomMaze.getM();
+	MTreeNode* start = MTreeNode::beginTree(i, j);
+	
+	buildFullMaze(randomMaze, *start);
+	
+	randomMaze.printMaze();
+	cout << endl;
+	int max = getMaxIndex(start, 0);
+	printTree(start, randomMaze.getN(), randomMaze.getM(), max);
+	cout << endl;
+
+	cout << "Max: " << max << endl;
+	int sum = 0, quantity = 0;
+	calculateSumAndQuantity(start, sum, quantity);
+	cout << "Middle: " << sum / quantity << endl;
 }

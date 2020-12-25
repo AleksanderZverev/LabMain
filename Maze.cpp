@@ -26,7 +26,7 @@ MCell* Maze::get_cell(int i, int j) const
 	if(!isInRange(i, j))
 		return nullptr;
 	
-	return m_field + (i * m_n + j);
+	return m_field + (i * m_m + j);
 }
 
 bool Maze::isInRange(int i, int j) const

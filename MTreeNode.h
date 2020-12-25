@@ -15,6 +15,7 @@ public:
 	MTreeNode* hasChild(int i, int j);
 	MTreeNode* findChild(int i, int j, bool isFullSeek = true);
 
+	static MTreeNode* searchNode(const MTreeNode& tree, const int i, const int j);
 	static MTreeNode* beginTree(int i, int j);
 
 protected:
