@@ -34,7 +34,7 @@ bool Maze::isInRange(int i, int j) const
 	return i < m_n && j < m_m && i >= 0 && j >= 0;
 }
 
-bool Maze::defineConnectionAndReturn(int i1, int j1, int i2, int j2, 
+bool Maze::defineConnectionAndReturn(int i1, int j1, int i2, int j2,
 	bool (*returnForRightConnection)(MCell* minCell),
 	bool (*returnForDownConnection)(MCell* minCell)) const
 {
@@ -60,26 +60,23 @@ bool Maze::defineConnectionAndReturn(int i1, int j1, int i2, int j2,
 
 bool Maze::hasConnection(int i1, int j1, int i2, int j2) const
 {
-	auto rightF = [](MCell* leftCell) -> bool { return leftCell->right();  };
-	auto downF = [](MCell* upCell) -> bool { return upCell->down(); };
-	
-	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
+	return defineConnectionAndReturn(i1, j1, i2, j2, 
+		hasConnectionLeftCell, 
+		hasConnectionUpCell);
 }
 
 bool Maze::makeConnection(int i1, int j1, int i2, int j2)
 {
-	auto rightF = [](MCell* leftCell) -> bool { leftCell->m_right = true; return true;  };
-	auto downF = [](MCell* upCell) -> bool { upCell->m_down = true; return true; };
-
-	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
+	return defineConnectionAndReturn(i1, j1, i2, j2, 
+		makeConnectionLeftCell, 
+		makeConnectionUpCell);
 }
 
 bool Maze::removeConnection(int i1, int j1, int i2, int j2)
 {
-	auto rightF = [](MCell* leftCell) -> bool { leftCell->m_right = false; return true;  };
-	auto downF = [](MCell* upCell) -> bool { upCell->m_down = false; return true; };
-
-	return defineConnectionAndReturn(i1, j1, i2, j2, rightF, downF);
+	return defineConnectionAndReturn(i1, j1, i2, j2, 
+		removeConnectionLeftCell, 
+		removeConnectionUpCell);
 }
 
 void Maze::printMaze() const
@@ -102,30 +99,34 @@ char Maze::getConnectionSymbol(int i, int j) const
 	const auto* topCell = get_cell(i - 1, j);
 	const auto* leftCell = get_cell(i, j - 1);
 
-	if (topCell != nullptr && leftCell != nullptr
-		&& topCell->down() && leftCell->right())
+	const bool hasTopConnection = topCell == nullptr ? false : topCell->down();
+	const bool hasLeftConnection = leftCell == nullptr ? false : leftCell->right();
+	const bool hasBotConnection = baseCell.down();
+	const bool hasRightConnection = baseCell.right();
+
+	if (hasTopConnection && hasLeftConnection)
 	{
-		if (baseCell.right() && baseCell.down()) return (char)197;
-		if (baseCell.right()) return (char)193;
-		if (baseCell.down()) return (char)180;
+		if (hasRightConnection && hasBotConnection) return (char)197;
+		if (hasRightConnection) return (char)193;
+		if (hasBotConnection) return (char)180;
 		return (char)217;
 	}
 
-	if (topCell != nullptr && topCell->down())
+	if (hasTopConnection)
 	{
-		if (baseCell.right() && baseCell.down()) return (char)195;
-		if (baseCell.right()) return (char)192;
-		if (baseCell.down()) return (char)179;
+		if (hasRightConnection && hasBotConnection) return (char)195;
+		if (hasRightConnection) return (char)192;
+		if (hasBotConnection) return (char)179;
 	}
 
-	if (leftCell != nullptr && leftCell->right())
+	if (hasLeftConnection)
 	{
-		if (baseCell.right() && baseCell.down()) return (char)194;
-		if (baseCell.right()) return (char)196;
-		if (baseCell.down()) return (char)191;
+		if (hasRightConnection && hasBotConnection) return (char)194;
+		if (hasRightConnection) return (char)196;
+		if (hasBotConnection) return (char)191;
 	}
 
-	if (baseCell.right() && baseCell.down())
+	if (hasTopConnection && hasLeftConnection)
 		return (char)218;
 
 	return (char)248;

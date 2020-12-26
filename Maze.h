@@ -26,6 +26,13 @@ protected:
 	bool isInRange(int i, int j) const;
 	
 private:
+	static bool hasConnectionLeftCell(MCell* leftCell) { return leftCell->right(); }
+	static bool hasConnectionUpCell(MCell* upCell) { return upCell->down(); }
+	static bool makeConnectionLeftCell(MCell* leftCell) { leftCell->m_right = true; return true; }
+	static bool makeConnectionUpCell(MCell* upCell) { upCell->m_down = true; return true; }
+	static bool removeConnectionLeftCell(MCell* leftCell) { leftCell->m_right = false; return true; }
+	static bool removeConnectionUpCell(MCell* upCell) { upCell->m_down = false; return true; }
+	
 	MCell* get_cell(int i, int j) const;
 
 	MCell* m_field = nullptr;
