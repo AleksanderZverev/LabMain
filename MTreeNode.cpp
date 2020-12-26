@@ -73,8 +73,7 @@ MTreeNode::MTreeNode(MTreeNode* parent, int i, int j, int distance) :
 	m_children_array(new MTreeNode*[max_children]),
 	m_i(i),
 	m_j(j),
-	m_distance(distance),
-	m_child_count(0)
+	m_distance(distance)
 { }
 
 MTreeNode::~MTreeNode()
