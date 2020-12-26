@@ -42,7 +42,7 @@ void connectUnreachableLines(Maze& maze)
 	}
 }
 
-void calculateDistances(MTreeNode* baseNode, Maze& maze)
+void calculateDistances(MTreeNode* baseNode, const Maze& maze)
 {
 	const int n = maze.getN(), m = maze.getM();
 
@@ -146,7 +146,7 @@ MTreeNode* pushNode(vector<MTreeNode*>& mazeArray, const int m, MTreeNode* node)
 	return mazeArray[index];
 }
 
-bool hasFreeNeighbors(vector<MTreeNode*>& mazeArray, int n, int m, int i, int j)
+bool hasFreeNeighbors(vector<MTreeNode*>& mazeArray, const int n, const int m, const int i, const int j)
 {
 	return i - 1 >= 0 && getNode(mazeArray, m, i - 1, j) == nullptr
 		|| j - 1 >= 0 && getNode(mazeArray, m, i, j - 1) == nullptr
